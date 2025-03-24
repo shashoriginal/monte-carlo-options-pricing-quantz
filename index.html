@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Options Pricing | QuantZ</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="QuantZ 4K.png" alt="QuantZ Logo" class="logo">
+            <h1>Monte Carlo Options Pricing</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#theory">Theory</a></li>
+                <li><a href="#simulations">Simulations</a></li>
+                <li><a href="#calculator">Calculator</a></li>
+                <li><a href="#practice">Practice Problems</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="intro" class="section">
+            <h2>Introduction to Monte Carlo Methods in Finance</h2>
+            <p>Monte Carlo methods are computational algorithms that rely on repeated random sampling to obtain numerical results. In finance, they're widely used for pricing complex options and securities where analytical solutions are difficult or impossible to obtain.</p>
+            <p>The Monte Carlo approach allows us to simulate thousands of possible future price paths for an underlying asset and then calculate the expected payoff under various scenarios.</p>
+            <div class="info-box">
+                <h3>Key Concepts:</h3>
+                <ul>
+                    <li><strong>Random Sampling:</strong> Using random numbers to simulate uncertain outcomes</li>
+                    <li><strong>Law of Large Numbers:</strong> As sample size increases, results converge to the expected value</li>
+                    <li><strong>Path Dependency:</strong> Some options depend on the entire price path, not just final price</li>
+                    <li><strong>Risk-Neutral Valuation:</strong> Pricing options in a risk-neutral framework</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="theory" class="section">
+            <h2>Monte Carlo Options Pricing Theory</h2>
+            <p>The Monte Carlo method for options pricing makes several key assumptions:</p>
+            <ul>
+                <li>Asset prices follow a stochastic process (typically geometric Brownian motion)</li>
+                <li>Markets are arbitrage-free</li>
+                <li>Risk-neutral valuation applies</li>
+                <li>The risk-free rate and volatility are known and constant (though this can be relaxed)</li>
+            </ul>
+            
+            <div class="formula-container">
+                <h3>Monte Carlo Simulation Formula</h3>
+                <div class="formula">
+                    <p>For stock price simulation:</p>
+                    <div id="stock-formula" class="math-formula"></div>
+                    <p>For option pricing:</p>
+                    <div id="option-formula" class="math-formula"></div>
+                    <p>Where:</p>
+                    <div id="parameters-formula" class="math-formula"></div>
+                </div>
+                <div class="formula-explanation">
+                    <ul>
+                        <li>\(S_t\) = Stock price at time t</li>
+                        <li>\(S_0\) = Initial stock price</li>
+                        <li>\(\mu\) = Drift rate (risk-free rate in risk-neutral world)</li>
+                        <li>\(\sigma\) = Volatility</li>
+                        <li>\(\Delta t\) = Time step</li>
+                        <li>\(\varepsilon\) = Random standard normal variable</li>
+                        <li>\(r\) = Risk-free interest rate</li>
+                        <li>\(T\) = Time to expiration</li>
+                        <li>\(N\) = Number of simulations</li>
+                        <li>\(C_0\) = Option price at time 0</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="greeks-container">
+                <h3>Calculating Greeks with Monte Carlo</h3>
+                <p>Greeks can also be calculated using Monte Carlo simulations:</p>
+                <div class="greeks-grid">
+                    <div class="greek-item">
+                        <h4>Delta (Δ)</h4>
+                        <p>Finite difference method by bumping the stock price.</p>
+                        <div id="delta-formula" class="math-formula"></div>
+                    </div>
+                    <div class="greek-item">
+                        <h4>Gamma (Γ)</h4>
+                        <p>Second derivative approximation using finite differences.</p>
+                        <div id="gamma-formula" class="math-formula"></div>
+                    </div>
+                    <div class="greek-item">
+                        <h4>Theta (Θ)</h4>
+                        <p>Effect of time decay on option price.</p>
+                        <div id="theta-formula" class="math-formula"></div>
+                    </div>
+                    <div class="greek-item">
+                        <h4>Vega (ν)</h4>
+                        <p>Sensitivity to volatility changes.</p>
+                        <div id="vega-formula" class="math-formula"></div>
+                    </div>
+                    <div class="greek-item">
+                        <h4>Rho (ρ)</h4>
+                        <p>Sensitivity to interest rate changes.</p>
+                        <div id="rho-formula" class="math-formula"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulations" class="section">
+            <h2>Interactive Simulations</h2>
+            
+            <div class="simulation-container">
+                <h3>Monte Carlo Stock Price Paths</h3>
+                <p>Simulate multiple stock price paths using Monte Carlo methods to understand the range of possible outcomes.</p>
+                <div class="simulation-controls">
+                    <div class="control-group">
+                        <label for="mc-s0">Initial Stock Price ($):</label>
+                        <input type="number" id="mc-s0" min="1" max="1000" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label for="mc-mu">Drift (μ, %):</label>
+                        <input type="number" id="mc-mu" min="-50" max="50" step="0.1" value="5">
+                    </div>
+                    <div class="control-group">
+                        <label for="mc-sigma">Volatility (σ, %):</label>
+                        <input type="number" id="mc-sigma" min="1" max="100" step="0.1" value="20">
+                    </div>
+                    <div class="control-group">
+                        <label for="mc-t">Time Horizon (years):</label>
+                        <input type="number" id="mc-t" min="0.1" max="10" step="0.1" value="1">
+                    </div>
+                    <div class="control-group">
+                        <label for="mc-paths">Number of Paths:</label>
+                        <input type="number" id="mc-paths" min="1" max="1000" value="20">
+                    </div>
+                    <button id="run-mc">Run Simulation</button>
+                </div>
+                <div id="mc-plot" class="plot-container"></div>
+            </div>
+
+            <div class="simulation-container">
+                <h3>Convergence Analysis</h3>
+                <p>Explore how Monte Carlo option prices converge as the number of simulations increases.</p>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="european">European Options</button>
+                    <button class="tab-btn" data-tab="asian">Asian Options</button>
+                    <button class="tab-btn" data-tab="lookback">Lookback Options</button>
+                    <button class="tab-btn" data-tab="barrier">Barrier Options</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="european" class="tab-pane active">
+                        <div class="simulation-controls">
+                            <div class="control-group">
+                                <label for="conv-s">Stock Price ($):</label>
+                                <input type="number" id="conv-s" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="conv-k">Strike Price ($):</label>
+                                <input type="number" id="conv-k" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="conv-t">Time to Expiry (years):</label>
+                                <input type="number" id="conv-t" min="0.01" max="10" step="0.01" value="1">
+                            </div>
+                            <div class="control-group">
+                                <label for="conv-r">Risk-free Rate (%):</label>
+                                <input type="number" id="conv-r" min="0" max="20" step="0.1" value="5">
+                            </div>
+                            <div class="control-group">
+                                <label for="conv-sigma">Volatility (%):</label>
+                                <input type="number" id="conv-sigma" min="1" max="100" step="0.1" value="20">
+                            </div>
+                            <div class="control-group">
+                                <label for="conv-type">Option Type:</label>
+                                <select id="conv-type">
+                                    <option value="call">Call</option>
+                                    <option value="put">Put</option>
+                                </select>
+                            </div>
+                            <button id="run-convergence">Run Analysis</button>
+                        </div>
+                        <div id="convergence-plot" class="plot-container"></div>
+                    </div>
+                    
+                    <div id="asian" class="tab-pane">
+                        <div class="simulation-controls">
+                            <div class="control-group">
+                                <label for="asian-s">Stock Price ($):</label>
+                                <input type="number" id="asian-s" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-k">Strike Price ($):</label>
+                                <input type="number" id="asian-k" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-t">Time to Expiry (years):</label>
+                                <input type="number" id="asian-t" min="0.01" max="10" step="0.01" value="1">
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-r">Risk-free Rate (%):</label>
+                                <input type="number" id="asian-r" min="0" max="20" step="0.1" value="5">
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-sigma">Volatility (%):</label>
+                                <input type="number" id="asian-sigma" min="1" max="100" step="0.1" value="20">
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-type">Option Type:</label>
+                                <select id="asian-type">
+                                    <option value="call">Call</option>
+                                    <option value="put">Put</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="asian-averaging">Averaging Method:</label>
+                                <select id="asian-averaging">
+                                    <option value="arithmetic">Arithmetic</option>
+                                    <option value="geometric">Geometric</option>
+                                </select>
+                            </div>
+                            <button id="run-asian">Run Analysis</button>
+                        </div>
+                        <div id="asian-plot" class="plot-container"></div>
+                    </div>
+                    
+                    <div id="lookback" class="tab-pane">
+                        <div class="simulation-controls">
+                            <div class="control-group">
+                                <label for="lookback-s">Stock Price ($):</label>
+                                <input type="number" id="lookback-s" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="lookback-t">Time to Expiry (years):</label>
+                                <input type="number" id="lookback-t" min="0.01" max="10" step="0.01" value="1">
+                            </div>
+                            <div class="control-group">
+                                <label for="lookback-r">Risk-free Rate (%):</label>
+                                <input type="number" id="lookback-r" min="0" max="20" step="0.1" value="5">
+                            </div>
+                            <div class="control-group">
+                                <label for="lookback-sigma">Volatility (%):</label>
+                                <input type="number" id="lookback-sigma" min="1" max="100" step="0.1" value="20">
+                            </div>
+                            <div class="control-group">
+                                <label for="lookback-type">Option Type:</label>
+                                <select id="lookback-type">
+                                    <option value="call">Call (max)</option>
+                                    <option value="put">Put (min)</option>
+                                </select>
+                            </div>
+                            <button id="run-lookback">Run Analysis</button>
+                        </div>
+                        <div id="lookback-plot" class="plot-container"></div>
+                    </div>
+                    
+                    <div id="barrier" class="tab-pane">
+                        <div class="simulation-controls">
+                            <div class="control-group">
+                                <label for="barrier-s">Stock Price ($):</label>
+                                <input type="number" id="barrier-s" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-k">Strike Price ($):</label>
+                                <input type="number" id="barrier-k" min="1" max="1000" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-b">Barrier Level ($):</label>
+                                <input type="number" id="barrier-b" min="1" max="1000" value="120">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-t">Time to Expiry (years):</label>
+                                <input type="number" id="barrier-t" min="0.01" max="10" step="0.01" value="1">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-r">Risk-free Rate (%):</label>
+                                <input type="number" id="barrier-r" min="0" max="20" step="0.1" value="5">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-sigma">Volatility (%):</label>
+                                <input type="number" id="barrier-sigma" min="1" max="100" step="0.1" value="20">
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-type">Barrier Type:</label>
+                                <select id="barrier-type">
+                                    <option value="up-and-out">Up-and-Out</option>
+                                    <option value="down-and-out">Down-and-Out</option>
+                                    <option value="up-and-in">Up-and-In</option>
+                                    <option value="down-and-in">Down-and-In</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="barrier-option">Option Type:</label>
+                                <select id="barrier-option">
+                                    <option value="call">Call</option>
+                                    <option value="put">Put</option>
+                                </select>
+                            </div>
+                            <button id="run-barrier">Run Analysis</button>
+                        </div>
+                        <div id="barrier-plot" class="plot-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-container">
+                <h3>Variance Reduction Techniques</h3>
+                <p>Explore techniques to improve Monte Carlo simulation efficiency and accuracy.</p>
+                <div class="simulation-controls">
+                    <div class="control-group">
+                        <label for="variance-s">Stock Price ($):</label>
+                        <input type="number" id="variance-s" min="1" max="1000" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label for="variance-k">Strike Price ($):</label>
+                        <input type="number" id="variance-k" min="1" max="1000" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label for="variance-t">Time to Expiry (years):</label>
+                        <input type="number" id="variance-t" min="0.01" max="10" step="0.01" value="1">
+                    </div>
+                    <div class="control-group">
+                        <label for="variance-r">Risk-free Rate (%):</label>
+                        <input type="number" id="variance-r" min="0" max="20" step="0.1" value="5">
+                    </div>
+                    <div class="control-group">
+                        <label for="variance-sigma">Volatility (%):</label>
+                        <input type="number" id="variance-sigma" min="1" max="100" step="0.1" value="20">
+                    </div>
+                    <div class="control-group">
+                        <label>Option Type:</label>
+                        <select id="variance-type">
+                            <option value="call">Call</option>
+                            <option value="put">Put</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Technique:</label>
+                        <select id="variance-technique">
+                            <option value="standard">Standard Monte Carlo</option>
+                            <option value="antithetic">Antithetic Variates</option>
+                            <option value="control">Control Variates</option>
+                            <option value="stratified">Stratified Sampling</option>
+                            <option value="importance">Importance Sampling</option>
+                        </select>
+                    </div>
+                    <button id="run-variance">Run Analysis</button>
+                </div>
+                <div id="variance-plot" class="plot-container"></div>
+            </div>
+        </section>
+
+        <section id="calculator" class="section">
+            <h2>Monte Carlo Options Calculator</h2>
+            <p>Calculate option prices for various exotic options using Monte Carlo simulation.</p>
+            
+            <div class="calculator-container">
+                <div class="calculator-inputs">
+                    <div class="input-group">
+                        <label for="calc-s">Stock Price ($):</label>
+                        <input type="number" id="calc-s" min="0.01" step="0.01" value="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-k">Strike Price ($):</label>
+                        <input type="number" id="calc-k" min="0.01" step="0.01" value="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-t">Time to Expiry (years):</label>
+                        <input type="number" id="calc-t" min="0.01" max="10" step="0.01" value="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-r">Risk-free Rate (%):</label>
+                        <input type="number" id="calc-r" min="0" max="20" step="0.1" value="5">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-sigma">Volatility (%):</label>
+                        <input type="number" id="calc-sigma" min="1" max="100" step="0.1" value="20">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-option-style">Option Style:</label>
+                        <select id="calc-option-style">
+                            <option value="european">European</option>
+                            <option value="asian">Asian</option>
+                            <option value="lookback">Lookback</option>
+                            <option value="barrier">Barrier</option>
+                            <option value="binary">Binary</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Option Type:</label>
+                        <div class="radio-group">
+                            <input type="radio" id="calc-call" name="option-type" value="call" checked>
+                            <label for="calc-call">Call</label>
+                            <input type="radio" id="calc-put" name="option-type" value="put">
+                            <label for="calc-put">Put</label>
+                        </div>
+                    </div>
+                    <div class="input-group" id="barrier-params" style="display: none;">
+                        <label for="calc-barrier">Barrier Level ($):</label>
+                        <input type="number" id="calc-barrier" min="0.01" step="0.01" value="120">
+                        <label for="calc-barrier-type">Barrier Type:</label>
+                        <select id="calc-barrier-type">
+                            <option value="up-and-out">Up-and-Out</option>
+                            <option value="down-and-out">Down-and-Out</option>
+                            <option value="up-and-in">Up-and-In</option>
+                            <option value="down-and-in">Down-and-In</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-simulations">Number of Simulations:</label>
+                        <input type="number" id="calc-simulations" min="1000" max="1000000" step="1000" value="10000">
+                    </div>
+                    <button id="calculate">Calculate</button>
+                </div>
+                
+                <div class="calculator-results">
+                    <div class="result-group">
+                        <h3>Option Price</h3>
+                        <div id="option-price" class="result-value">-</div>
+                        <div id="confidence-interval" class="confidence-interval">95% CI: [-,-]</div>
+                    </div>
+                    <div class="result-group">
+                        <h3>Greeks (Approximations)</h3>
+                        <div class="greeks-results">
+                            <div class="greek-result">
+                                <span class="greek-label">Delta (Δ):</span>
+                                <span id="result-delta" class="greek-value">-</span>
+                            </div>
+                            <div class="greek-result">
+                                <span class="greek-label">Gamma (Γ):</span>
+                                <span id="result-gamma" class="greek-value">-</span>
+                            </div>
+                            <div class="greek-result">
+                                <span class="greek-label">Theta (Θ):</span>
+                                <span id="result-theta" class="greek-value">-</span>
+                            </div>
+                            <div class="greek-result">
+                                <span class="greek-label">Vega (ν):</span>
+                                <span id="result-vega" class="greek-value">-</span>
+                            </div>
+                            <div class="greek-result">
+                                <span class="greek-label">Rho (ρ):</span>
+                                <span id="result-rho" class="greek-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-group">
+                        <h3>Simulation Details</h3>
+                        <div class="simulation-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Standard Error:</span>
+                                <span id="std-error" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Execution Time:</span>
+                                <span id="exec-time" class="detail-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="practice" class="section">
+            <h2>Practice Problems</h2>
+            <p>Test your understanding of Monte Carlo option pricing with these randomized practice problems.</p>
+            
+            <div class="problem-controls">
+                <button id="generate-problem">New Problem</button>
+                <div class="difficulty-selector">
+                    <label>Difficulty:</label>
+                    <select id="problem-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="problem-container">
+                <div id="problem-text" class="problem-text">
+                    <p>Click "New Problem" to generate a practice problem.</p>
+                </div>
+                
+                <div class="solution-input">
+                    <label for="user-answer">Your Answer:</label>
+                    <input type="number" id="user-answer" step="0.0001" placeholder="Enter your answer...">
+                    <button id="check-answer">Check Answer</button>
+                </div>
+                
+                <div id="feedback" class="feedback hidden">
+                    <div id="feedback-message"></div>
+                    <div id="explanation" class="explanation"></div>
+                </div>
+            </div>
+            
+            <div class="problem-history">
+                <h3>Problem History</h3>
+                <div id="history-list" class="history-list">
+                    <p>Your solved problems will appear here.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="QuantZ 4K.png" alt="QuantZ Logo" class="footer-logo-img">
+                <p>QuantZ | Premier Quantitative and STEM Finance Club at Michigan State University</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#intro">Introduction</a></li>
+                    <li><a href="#theory">Theory</a></li>
+                    <li><a href="#simulations">Simulations</a></li>
+                    <li><a href="#calculator">Calculator</a></li>
+                    <li><a href="#practice">Practice Problems</a></li>
+                </ul>
+            </div>
+            <div class="footer-copyright">
+                <h3>About</h3>
+                <p>&copy; 2025 Shashank. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
